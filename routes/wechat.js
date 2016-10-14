@@ -106,6 +106,13 @@ router.use('/', wechat(config.token).text(function(message, req, res, next) {
   // MediaId: 'OMYnpghh8fRfzHL8obuboDN9rmLig4s0xdpoNT6a5BoFZWufbE6srbCKc_bxduzS',
   // Format: 'amr',
   // MsgId: '5837397520665436492' }
+  var content = message.Content;
+  res.reply({
+          content: '哦，你发了一个语音!',
+          type: 'text'
+  });
+
+
 }).video(function(message, req, res, next) {
   // message为视频内容
   // { ToUserName: 'gh_d3e07d51b513',
