@@ -25,5 +25,9 @@
   },
   "engines": {
     "node": "4.x"
+  },
+  "devDependencies": {
+    "formidable": "^1.0.17",
+    "request": "^2.75.0"
   }
 }

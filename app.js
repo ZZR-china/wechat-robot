@@ -6,14 +6,18 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var todos = require('./routes/todos');
 var wechat = require('./routes/wechat');
+var routerVoice = require('./routes/voice');
 var AV = require('leanengine');
+var ejs = require('ejs');
 
 var app = express();
 
 // 设置模板引擎
+app.engine('html', ejs.__express);
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-app.use(express.static('public'));
+app.set('view engine', 'html');
+
+app.use(express.static('views/static/'));
 
 // 设置默认超时时间
 app.use(timeout('15s'));
@@ -34,6 +38,7 @@ app.get('/', function(req, res) {
 // 可以将一类的路由单独保存在一个文件中
 app.use('/todos', todos);
 app.use('/wechat', wechat);
+routerVoice(app);
 
 app.use(function(req, res, next) {
   // 如果任何一个路由都没有返回响应，则抛出一个 404 异常给后续的异常处理器

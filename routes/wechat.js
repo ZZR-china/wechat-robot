@@ -1,7 +1,7 @@
 var router = require('express').Router();
 // 引用 wechat 库，详细请查看 https://github.com/node-webot/wechat
 var wechat = require('wechat');
-var weAuth = require('../public/libs/weAuth');
+var weAuth = require('../helper/weAuth');
 var config = {
   token: 'wetest',
   appid: 'wx69ea90a0852fd73d',
@@ -13,8 +13,16 @@ var WechatAPI = require('wechat-api');
 var api = new WechatAPI('wx69ea90a0852fd73d',
   '4b7e21a506ede8ff1264576eec89513b');
 
+router.route('/')
+      .get(function(req, res, next){
+        res.render('wechatvoice')
+      })
+      .post(function(req, res, next){
+        var message = req.weixin;
+        if (message.MsgType === voice) {
 
-router.get('/', weAuth);
+        }
+      });
 
 
 router.use('/', wechat(config.token).text(function(message, req, res, next) {
@@ -106,13 +114,13 @@ router.use('/', wechat(config.token).text(function(message, req, res, next) {
   // MediaId: 'OMYnpghh8fRfzHL8obuboDN9rmLig4s0xdpoNT6a5BoFZWufbE6srbCKc_bxduzS',
   // Format: 'amr',
   // MsgId: '5837397520665436492' }
-  var content = message.Content;
+  var content = message.Content,
+      MediaId = message.MediaId;
+
   res.reply({
-          content: '哦，你发了一个语音!',
-          type: 'text'
+      content: '哦，你发了一个语音!' + MediaId,
+      type: 'text'
   });
-
-
 }).video(function(message, req, res, next) {
   // message为视频内容
   // { ToUserName: 'gh_d3e07d51b513',
@@ -196,5 +204,7 @@ router.use('/', wechat(config.token).text(function(message, req, res, next) {
   // OpenID: 'oPKu7jgOibOA-De4u8J2RuNKpZRw' }
   // TODO
 }).middlewarify());
+
+
 
 module.exports = router;

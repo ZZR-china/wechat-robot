@@ -3,7 +3,7 @@ const path = require('path');
 const url = require('url');
 
 //import config
-const config = require('../../config');
+const config = require('../config');
 
 //进行sha1加密
 function sha1(str) {
