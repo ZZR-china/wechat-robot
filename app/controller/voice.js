@@ -6,8 +6,7 @@ var formidable = require('formidable');
 var http = require('http');
 var path = require('path');
 var request = require('request');
-var config = require('../config');
-
+var config = require('../../config/config');
 
 var mp3url = 'http://7xrwoa.com1.z0.glb.clouddn.com/first.mp3';
 
@@ -28,10 +27,9 @@ function callback(error, response, body) {
     }
 }
 
-
 router.route('/voice')
     .get(function(req, res, next) {
-        var filePath = path.join(config.rootname + '/tem/');
+        var filePath = path.join(config.root + '/tem/');
         var fileName = new Date().getTime() + '.mp3';
         var writeoption = filePath + fileName;
         console.log(writeoption)
@@ -173,8 +171,6 @@ router.route('/file/:filename')
             res.end(404);
         }
     });
-
-
 
 module.exports = function(app) {
     app.use('/', router);

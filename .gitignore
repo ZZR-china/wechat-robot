@@ -7,3 +7,5 @@ start.sh
 *~
 *.swp
 .avoscloud/
+
+config/private.js
