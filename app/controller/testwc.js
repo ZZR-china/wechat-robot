@@ -4,7 +4,6 @@ var wechat = require('wechat');
 var weAuth = require('../helpers/weAuth');
 var config = require('../../config/config');
 
-
 router.route('/testwc')
       .get(function(req, res, next) {
         weAuth(req, res)

@@ -11,9 +11,12 @@ var config = require('../../config/config'),
 
 var voiceModule = {
     getVoice: function(callback) {
-        voice_mongo.find({}, function(err, voice) {
-            return callback(voice);
-        });
+        var query = voice_mongo.find();
+        query.where({status:0});
+        query.exec(function(err, rs){
+            if (err) {throw err};
+            return callback(rs);
+        })
     },
     saveVoice: function(voice, callback) {
         voice = new voice_mongo({

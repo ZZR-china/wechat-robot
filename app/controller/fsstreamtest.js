@@ -27,7 +27,7 @@ function callback(error, response, body) {
     }
 }
 
-router.route('/voice')
+router.route('/fsstream')
     .get(function(req, res, next) {
         var filePath = path.join(config.root + '/tem/');
         var fileName = new Date().getTime() + '.mp3';
@@ -56,7 +56,7 @@ router.route('/voice')
         res.send('success');
     })
 
-router.route('/upload')
+router.route('/fsstreamupload')
     .post(function(req, res, next) {
         var form = new formidable.IncomingForm();
 
@@ -102,7 +102,7 @@ router.route('/upload')
         })
     })
 
-router.route('/text')
+router.route('/fsstreamtext')
     .get(function(req, res, next) {
         fs.writeFile("my.txt", "Javascript很赞", function(err) {
             if (!err)
@@ -129,7 +129,7 @@ router.route('/text')
 
     })
 
-router.route('/file')
+router.route('/fsstreamfile')
     .get(function(req, res, next) {
         const filePath = path.join(__dirname, './');
         console.log(filePath)
@@ -152,7 +152,7 @@ router.route('/file')
 
     })
 
-router.route('/file/:filename')
+router.route('/fsstreamfile/:filename')
     .get(function(req, res, next) {
         // 实现文件下载
         var fileName = req.params.filename;
