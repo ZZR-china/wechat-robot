@@ -1,7 +1,6 @@
 const crypto = require('crypto');
 const path = require('path');
 const url = require('url');
-//import config
 const config = require('../../config/config');
 //进行sha1加密
 function sha1(str) {
@@ -18,7 +17,7 @@ function wechatAuth(req, res) {
   var timestamp = query['timestamp'];
   var nonce = query.nonce;
 
-  var reqArray = [nonce, timestamp, config.token];
+  var reqArray = [nonce, timestamp, config.wechat.token];
 
   //对数组进行字典排序
   reqArray.sort();
@@ -32,6 +31,5 @@ function wechatAuth(req, res) {
     console.log("授权失败!");
   }
 }
-
 
 module.exports = wechatAuth;

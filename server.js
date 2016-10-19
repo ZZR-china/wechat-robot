@@ -15,11 +15,11 @@ glob = require('glob');
 mongoose = require('mongoose');
 
 // Mongodb 预加载
-// models = glob.sync(config.root + '/app/models/*.js');
-// models.forEach(function (model) {
-//   console.log('Loading Mongodb model：' + model);
-//   require(model);
-// });
+models = glob.sync(config.root + './app/models/*.js');
+models.forEach(function (model) {
+  console.log('Loading Mongodb model：' + model);
+  require(model);
+});
 
 AV.init({
   appId: process.env.LEANCLOUD_APP_ID,
@@ -51,4 +51,4 @@ app.listen(PORT, function () {
 });
 
 // 应用程序启动 mongoose
-require('./app/helper/mongoconn');
+require('./app/helpers/mongoconn');

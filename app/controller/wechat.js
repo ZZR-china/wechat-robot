@@ -1,7 +1,7 @@
 var router = require('express').Router();
 // 引用 wechat 库，详细请查看 https://github.com/node-webot/wechat
 var wechat = require('wechat');
-var weAuth = require('../helper/weAuth');
+var weAuth = require('../helpers/weAuth');
 var config = {
   token: 'wetest',
   appid: 'wx69ea90a0852fd73d',

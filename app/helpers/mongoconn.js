@@ -1,12 +1,10 @@
 var mongoose = require('mongoose');
 
-var mongourl = process.env.mongo;
-
-if (mongourl) {
-    mongoose.connect(mongourl, { server: { socketOptions: { keepAlive: 1 } } });
+if (process.env.online) {
+    mongoose.connect(process.env.mongo, { server: { socketOptions: { keepAlive: 1 } } });
 } else {
-    const setting = require('../../config/private');
-    const localurl = setting.url;
+    var setting = require('../../config/config');
+    var localurl = setting.mongo.db;
     mongoose.connect(localurl, { server: { socketOptions: { keepAlive: 1 } } });
 }
 
