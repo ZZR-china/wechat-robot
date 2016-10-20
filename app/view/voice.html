@@ -19,7 +19,32 @@
       </div>
 
     </div>
+
+    <div class="voice postd">
+      <div>post to voice</div>
+      <button class="post">post</button>
+    </div>
     <script type="text/javascript" src="/lib/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript">
+    var $post = $('.post');
+    $post.click(function(){
+      $.ajax({
+        type: 'post',
+        url: 'http://wechatme.leanapp.cn/voice',
+        success:function(data){
+          if (data) {
+            alert('succes')
+          }else{
+            alert('get succes err')
+          }
+        },
+        err:function(){
+          alert('ajax fail')
+        }
+      })
+    })
+
+    </script>
 </body>
 
 </html>

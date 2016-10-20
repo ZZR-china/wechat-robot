@@ -25,6 +25,12 @@ module.exports = function(app, config) {
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(cookieParser());
     // load controller
+    app.use(function(req,res,next){
+      res.set({
+          'Access-Control-Allow-Origin': '*',
+        });
+      next();
+    });
     app.get('/', function(req, res) {
         res.render('index', { currentTime: new Date() });
     });
