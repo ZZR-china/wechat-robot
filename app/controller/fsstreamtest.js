@@ -27,6 +27,15 @@ function callback(error, response, body) {
     }
 }
 
+router.route('/baidu')
+      .get(function(req, res, next){
+        request('https://www.baidu.com')
+               .pipe(res)
+               .on('finish', ()=>{
+                  console.log('request get is done')
+               })
+      })
+
 router.route('/fsstream')
     .get(function(req, res, next) {
         var filePath = path.join(config.root + '/tem/');
