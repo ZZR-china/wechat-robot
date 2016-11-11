@@ -8,7 +8,5 @@ start.sh
 *.swp
 .avoscloud/
 
-config/config.js
-/config.js
-
-*/config.js
+./config/secret.js
+../config/secret.js

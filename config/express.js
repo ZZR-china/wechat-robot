@@ -8,6 +8,7 @@ var express = require('express'),
     AV = require('leanengine'),
     ejs = require('ejs'),
     async = require('async'),
+    models,
     glob = require('glob');
 
 var controllers;
@@ -24,16 +25,29 @@ module.exports = function(app, config) {
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(cookieParser());
-    // load controller
+
+    // Mongodb 预加载
+    models = glob.sync(config.root + './app/models/*.js');
+    async.each(models, function(model, callback) {
+        console.log('Loading Mongodb model：' + model);
+        require(model);
+        callback();
+    }, function(err) {
+        if (err) {
+            console.log('A model failed to process.');
+        }
+    })
+    //mongo connect
+    const db = require('../app/helpers/mongoconn')
+
     app.use(function(req,res,next){
       res.set({
           'Access-Control-Allow-Origin': '*',
         });
       next();
     });
-    app.get('/', function(req, res) {
-        res.render('index', { currentTime: new Date() });
-    });
+
+    // load controller
 
     controllers = glob.sync(config.root + '/app/controller/*.js');
     async.each(controllers, function(controller, callback) {

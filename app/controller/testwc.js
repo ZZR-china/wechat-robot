@@ -3,11 +3,6 @@ const router = require('express').Router(),
       wechat = require('wechat'),
       request = require('request');
 
-router.route('/testwc')
-    .get(function(req, res, next) {
-        res.send('testwc');
-    })
-
 router.use('/testwc', wechat('testwc', (req, res, next) => {
     // 微信输入信息都在req.weixin上
     const message = req.weixin,
@@ -36,7 +31,15 @@ router.use('/testwc', wechat('testwc', (req, res, next) => {
     };
 }));
 
+router.route('/testwc')
+    .get(function(req, res, next) {
+        res.send('testwc');
+    })
 
+router.route('/access_token')
+      .get((req, res)=> {
+
+      })
 module.exports = function(app) {
     app.use('/', router);
 };

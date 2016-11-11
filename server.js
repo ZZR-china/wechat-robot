@@ -4,22 +4,11 @@ var AV = require('leanengine');
 var express,
     config,
     glob,
-    mongoose,
-    models,
     app;
-
 
 express = require('express');
 config = require('./config/config');
 glob = require('glob');
-mongoose = require('mongoose');
-
-// Mongodb 预加载
-models = glob.sync(config.root + './app/models/*.js');
-models.forEach(function (model) {
-  console.log('Loading Mongodb model：' + model);
-  require(model);
-});
 
 AV.init({
   appId: process.env.LEANCLOUD_APP_ID,
