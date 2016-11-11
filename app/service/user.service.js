@@ -15,7 +15,9 @@ const user = {
                         is_admin: admin
                     }
                     const url = config.pos.url + '/register';
+                    console.log(url)
                     request_http.post({ url: url, form: data }, (err, httpResponse, body) => {
+                        console.log(body);
                         resolve(body);
                     })
                 })

@@ -3,7 +3,7 @@
  * Module description: token persistence 令牌持久化
  */
 
-const token_mongo = require('../models/token'),
+var token_mongo = require('../models/token'),
     config = require('../../config/config'),
     request_https = require('request');
 
@@ -20,13 +20,13 @@ function getToken(url) {
 function saveTokenIndb(url) {
     getToken(url)
         .then(token => {
-            let tokenJson = JSON.parse(token);
+            var tokenJson = JSON.parse(token);
             switch (tokenJson.errcode) {
                 case 45009:
                     console.log(data);
                     break;
                 case null:
-                    const token_data = {
+                    var token_data = {
                         access_token: token.access_token,
                         expires_in: token.expires_in
                     }

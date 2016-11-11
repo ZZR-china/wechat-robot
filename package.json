@@ -37,6 +37,6 @@
     "wechat-api": "^1.28.1"
   },
   "engines": {
-    "node": "4.x"
+    "node": "6.x"
   }
 }

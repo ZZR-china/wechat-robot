@@ -1,5 +1,5 @@
 'use strict';
-const express = require('express'),
+var express = require('express'),
     timeout = require('connect-timeout'),
     compression = require('compression'),
     path = require('path'),
@@ -11,7 +11,7 @@ const express = require('express'),
     glob = require('glob'),
     wechat_token = require('../app/helpers/TokenPojo.js');
 
-let models,
+var models,
     controllers;
 
 
@@ -40,7 +40,7 @@ module.exports = function(app, config) {
             }
         })
         //mongo connect
-    const db = require('../app/helpers/mongoconn')
+    var db = require('../app/helpers/mongoconn')
     app.use(function(req, res, next) {
         res.set({
             'Access-Control-Allow-Origin': '*',
@@ -62,17 +62,17 @@ module.exports = function(app, config) {
     })
 
     //获取token并存入数据库
-    let appId,
+    var appId,
         appSecret;
     if (process.env.online) {
         appId = process.env.testwechat_appId;
         appSecret = process.env.testwechat_appSecret;
     } else {
-        const secret = require('./secret');
+        var secret = require('./secret');
         appId = secret.testwechat.appId;
         appSecret = secret.testwechat.appSecret;
     }
-    const token_url = config.wechat_api.token_url + '&appId=' + appId + '&secret=' + appSecret;
+    var token_url = config.wechat_api.token_url + '&appId=' + appId + '&secret=' + appSecret;
     wechat_token.saveToken(token_url);
 
     app.use(function(req, res, next) {
@@ -90,7 +90,7 @@ module.exports = function(app, config) {
             // 忽略 websocket 的超时
             return;
         }
-        const statusCode = err.status || 500;
+        var statusCode = err.status || 500;
         if (statusCode === 500) {
             console.error(err.stack || err);
         }
@@ -99,7 +99,7 @@ module.exports = function(app, config) {
         }
         res.status(statusCode);
         // 默认不输出异常详情
-        let error = {}
+        var error = {}
         if (app.get('env') === 'development') {
             // 如果是开发环境，则将异常堆栈输出到页面，方便开发调试
             error = err;
