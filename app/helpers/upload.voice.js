@@ -5,7 +5,7 @@
 
 var async = require('async'),
     dateTime = require('./dateTime'),
-    config = require('../../config/config'),
+    secret = require('../../config/secret'),
     request_https = require('request'),
     AWS = require('aws-sdk'),
     shortid = require('shortid');
@@ -15,8 +15,8 @@ if (process.env.online) {
     AWS.config.accessKeyId = process.env.accessKey;
     AWS.config.secretAccessKey = process.env.secretKey;
 }else{
-    AWS.config.accessKeyId = config.accessKey;
-    AWS.config.secretAccessKey = config.secretKey;
+    AWS.config.accessKeyId = secret.AWS.accessKey;
+    AWS.config.secretAccessKey = secret.AWS.secretKey;
 }
 
 /**
