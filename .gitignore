@@ -10,3 +10,4 @@ start.sh
 
 ./config/secret.js
 ../config/secret.js
+/config/secret.js
