@@ -5,8 +5,10 @@ const reg ={
             isadminReg = /\?admin$/;
       const isNew = newUserReg.test(str),
             isAdmin = isadminReg.test(str);
+      console.log('str', str);
+      console.log('isAdmin', isAdmin);
       const store_id = str.replace(newUserReg,"").replace(isadminReg,"");
-      resolve(store_id, isAdmin);
+      resolve([store_id, isAdmin]);
     });
   },
 }

@@ -24,7 +24,7 @@ var config = {
     token_url: 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential'
   },
   pos:{
-    url: '4s.dkys.org:10943'
+    url: 'http://4s.dkys.org:10943'
   }
 };
 

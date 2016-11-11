@@ -12,10 +12,19 @@ router.use('/testwc', wechat('testwc', (req, res, next) => {
           event   = message.Event;
     switch (event) {
         case "subscribe":
-            res.reply({
-                content: '欢迎关注！用户的openid为' + openid + '场景是' + scence,
-                type: 'text'
-            });
+            posUser.addUser(openid, scence)
+                   .then(data =>{
+                      res.reply({
+                          content: '欢迎关注！用户的openid为' + openid + '场景是' + scence,
+                          type: 'text'
+                      });
+                   })
+                   .catch(err =>{
+                     res.reply({
+                      content: '创建新员工失败！用户的openid为' + openid + '场景是' + scence,
+                      type: 'text'
+                     })
+                   })
             break;
         case "SCAN":
             posUser.addUser(openid, scence)
