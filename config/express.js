@@ -1,5 +1,5 @@
 'use strict';
-var express = require('express'),
+const express = require('express'),
     timeout = require('connect-timeout'),
     compression = require('compression'),
     path = require('path'),
@@ -8,10 +8,12 @@ var express = require('express'),
     AV = require('leanengine'),
     ejs = require('ejs'),
     async = require('async'),
-    models,
-    glob = require('glob');
+    glob = require('glob'),
+    wechat_token = require('../app/helpers/TokenPojo.js');
 
-var controllers;
+let models,
+    controllers;
+
 
 module.exports = function(app, config) {
     app.engine('html', ejs.__express);
@@ -29,22 +31,21 @@ module.exports = function(app, config) {
     // Mongodb 预加载
     models = glob.sync(config.root + './app/models/*.js');
     async.each(models, function(model, callback) {
-        console.log('Loading Mongodb model：' + model);
-        require(model);
-        callback();
-    }, function(err) {
-        if (err) {
-            console.log('A model failed to process.');
-        }
-    })
-    //mongo connect
+            console.log('Loading Mongodb model：' + model);
+            require(model);
+            callback();
+        }, function(err) {
+            if (err) {
+                console.log('A model failed to process.');
+            }
+        })
+        //mongo connect
     const db = require('../app/helpers/mongoconn')
-
-    app.use(function(req,res,next){
-      res.set({
-          'Access-Control-Allow-Origin': '*',
+    app.use(function(req, res, next) {
+        res.set({
+            'Access-Control-Allow-Origin': '*',
         });
-      next();
+        next();
     });
 
     // load controller
@@ -59,6 +60,20 @@ module.exports = function(app, config) {
             console.log('A file failed to process.');
         }
     })
+
+    //获取token并存入数据库
+    let appId,
+        appSecret;
+    if (process.env.online) {
+        appId = process.env.testwechat_appId;
+        appSecret = process.env.testwechat_appSecret;
+    } else {
+        const secret = require('./secret');
+        appId = secret.testwechat.appId;
+        appSecret = secret.testwechat.appSecret;
+    }
+    const token_url = config.wechat_api.token_url + '&appId=' + appId + '&secret=' + appSecret;
+    wechat_token.saveToken(token_url);
 
     app.use(function(req, res, next) {
         // 如果任何一个路由都没有返回响应，则抛出一个 404 异常给后续的异常处理器
@@ -75,7 +90,7 @@ module.exports = function(app, config) {
             // 忽略 websocket 的超时
             return;
         }
-        var statusCode = err.status || 500;
+        const statusCode = err.status || 500;
         if (statusCode === 500) {
             console.error(err.stack || err);
         }
@@ -84,7 +99,7 @@ module.exports = function(app, config) {
         }
         res.status(statusCode);
         // 默认不输出异常详情
-        var error = {}
+        let error = {}
         if (app.get('env') === 'development') {
             // 如果是开发环境，则将异常堆栈输出到页面，方便开发调试
             error = err;

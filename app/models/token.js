@@ -1,13 +1,9 @@
 var mongoose     = require('mongoose'),
     Schema       = mongoose.Schema,
     token_Schema = new Schema({
-        _id         : Number,
-        errcode     : Number,
-        errmsg      : String,
-        ticket      : String,
         access_token: String,
         expires_in  : Number,
-        lastUpdated : String
+        createTime  : {type: Date, default: Date.now }
     });
 
 token_Schema.pre('save', function(next) {
@@ -24,4 +20,4 @@ token_Schema.statics = {
 
 var token = mongoose.model('token', token_Schema, "token");
 
-module.exports = token
+module.exports = exports = token

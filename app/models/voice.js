@@ -30,4 +30,4 @@ voice_Schema.statics = {
 
 var voice = mongoose.model('voice', voice_Schema);
 
-module.exports = voice
+module.exports = exports = voice

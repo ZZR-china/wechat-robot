@@ -20,11 +20,11 @@ var config = {
     secret     : 'foowala',
     sessionName: 'session'
   },
-  yunpian  : {
-    apiKey : '20a4152a354eaea512a093e891e08639'
+  wechat_api:{
+    token_url: 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential'
   },
-  pay : {
-    way: 0.03
+  pos:{
+    url: '4s.dkys.org:10943'
   }
 };
 
