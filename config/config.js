@@ -21,10 +21,11 @@ var config = {
     sessionName: 'session'
   },
   wechat_api:{
-    token_url: 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential'
+    token_url: 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential',
+    user_url: 'https://api.weixin.qq.com/cgi-bin/user/info?access_token='
   },
   pos:{
-    url: 'http://4s.dkys.org:10943'
+    url: 'http://4s.dkys.org:15586'
   }
 };
 

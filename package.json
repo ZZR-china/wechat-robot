@@ -33,8 +33,10 @@
     "request": "^2.75.0",
     "s3-upload-stream": "^1.0.7",
     "shortid": "^2.2.6",
+    "websocket": "^1.0.23",
     "wechat": "^2.0.3",
-    "wechat-api": "^1.28.1"
+    "wechat-api": "^1.32.0",
+    "ws": "^1.1.1"
   },
   "engines": {
     "node": "6.x"

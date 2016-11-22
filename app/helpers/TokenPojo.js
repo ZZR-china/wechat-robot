@@ -25,7 +25,7 @@ function saveTokenIndb(url) {
                 case 45009:
                     console.log(data);
                     break;
-                case null:
+                case undefined:
                     var token_data = {
                         access_token: token.access_token,
                         expires_in: token.expires_in
@@ -35,7 +35,7 @@ function saveTokenIndb(url) {
                     });
                     break;
                 default:
-                    console.log('something happen', errcode);
+                    console.log('something happen', tokenJson);
                     break;
             }
         })
@@ -46,6 +46,7 @@ function saveTokenIndb(url) {
 
 exports.saveToken = function(url) {
     setInterval(function() {
-        saveTokenIndb(url);
+        // saveTokenIndb(url);
+        console.log('token')
     }, 900000)
 }

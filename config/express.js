@@ -9,11 +9,11 @@ var express = require('express'),
     ejs = require('ejs'),
     async = require('async'),
     glob = require('glob'),
+    http = require('http'),
     wechat_token = require('../app/helpers/TokenPojo.js');
 
 var models,
     controllers;
-
 
 module.exports = function(app, config) {
     app.engine('html', ejs.__express);
@@ -39,7 +39,7 @@ module.exports = function(app, config) {
                 console.log('A model failed to process.');
             }
         })
-        //mongo connect
+    //mongo connect
     var db = require('../app/helpers/mongoconn')
     app.use(function(req, res, next) {
         res.set({
@@ -49,7 +49,6 @@ module.exports = function(app, config) {
     });
 
     // load controller
-
     controllers = glob.sync(config.root + '/app/controller/*.js');
     async.each(controllers, function(controller, callback) {
         console.log('Loading Router：', controller);

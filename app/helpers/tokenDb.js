@@ -3,10 +3,10 @@
  * Module description: 令牌模块（data）
  */
 
- var token_mongo = require('../models/token');
+var token_mongo = require('../models/token');
 
 function getToken (callback) {
-  token_mongo.findOne({ _id: 1}, function(err, token) {
+  token_mongo.findOne({ expires_in: 7200}, function(err, token) {
     if (err) {
       err.err = 1;
       err.errmsg = "ERROR unable to retrieve WeChat Token from DB. Please alert administrators: " + err.message;
