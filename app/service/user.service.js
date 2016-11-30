@@ -5,56 +5,6 @@ const regqr = require('../helpers/regqr'),
     request_post = require('../helpers/request_post');
 
 const user = {
-    addUser: (open_id, str) => {
-        return new Promise((resolve, reject) => {
-            const openidUrl = config.pos.url + '/staff/' + open_id;
-            const accesstokenUrl = config.pos.url + '/accesstoken';
-            let arr, staff_register_info = {};
-            Promise.all([
-                    regqr.getStoreid(str),
-                    request_get.requestGet(openidUrl)
-                ])
-                .then(results => {
-                    arr = results[0];
-                    const staff_info = JSON.parse(results[1]);
-                    console.log('staff_info', staff_info)
-                    if (staff_info.status === 1) {
-                        let user = {};
-                        user.open_id = open_id;
-                        user.status = 2;
-                        user.uid = arr[1];
-                        return resolve(user);
-                    }
-                    staff_register_info = {
-                        open_id: open_id,
-                        store_id: arr[0],
-                        job_number: "0",
-                        password: "123456",
-                        is_admin: arr[2]
-                    }
-                    return request_get.requestGet(accesstokenUrl)
-                })
-                .then(result => {
-                    //get user wechat info
-                    const userUrl = config.wechat_api.user_url + result + '&openid=' + open_id + '&lang=zh_CN';
-                    return request_get.requestGet(userUrl)
-                })
-                .then(result => {
-                    //register user with wx info
-                    const registerUrl = config.pos.url + '/register';
-                    staff_register_info.wx_info = result;
-                    return request_post.requestPost(registerUrl, staff_register_info)
-                })
-                .then(result => {
-                    result = JSON.parse(result);
-                    result.uid = arr[1];
-                    return resolve(result);
-                })
-                .catch(err => {
-                    console.error(err);
-                })
-        })
-    },
     adminRgister: (open_id, store_id) => {
         return new Promise((resolve, reject) => {
             const adminUrl = config.pos.url + '/register';
@@ -62,47 +12,91 @@ const user = {
             admin_register_info.is_admin = true;
             admin_register_info.open_id = open_id;
             admin_register_info.store_id = store_id;
-            admin_register_info.job_number = "001";
             admin_register_info.password = "123";
             request_post.requestPost(adminUrl, admin_register_info)
                 .then(result => {
-                    return resolve(result);
+                    const json_result = JSON.parse(result),
+                          status = json_result.status;
+                    let   staff_data = json_result.data ? json_result.data:{};
+                    console.log('staff_data', staff_data);
+                    staff_data.scence = "register";
+                    if (status === 1) {
+                        staff_data.isRegister = 1;
+                    } else {
+                        staff_data.isRegister = 2;
+                    }
+                    var connection = global.connection;
+                    connection.send(JSON.stringify(staff_data));
+                    resolve(staff_data);
                 })
                 .catch(err => {
                     console.error(err);
                 })
         })
     },
-    loginCheck: (open_id, uid) => {
+    staffRgister: (open_id, store_id) => {
         return new Promise((resolve, reject) => {
-            const openidUrl = config.pos.url + '/staff/' + open_id;
-            const accesstokenUrl = config.pos.url + '/accesstoken';
-            let arr, staff_register_info = {};
-            request_get.requestGet(openidUrl)
+            const staffUrl = config.pos.url + '/register';
+            let staff_register_info = {};
+            staff_register_info.is_admin = false;
+            staff_register_info.open_id = open_id;
+            staff_register_info.store_id = store_id;
+            staff_register_info.password = "123";
+            request_post.requestPost(staffUrl, staff_register_info)
                 .then(result => {
-                    result = JSON.parse(result);
-                    const postUrl = config.pos.url + '/uid';
-                    if (result.status === 1) {
-                        result.isLogin = true;
-                        result.uid = uid;
-                        result.open_id = open_id;
-                        return request_post.requestPost(postUrl, result);
-                    }else{
-                        let uid_doc = {};
-                        uid_doc.uid = uid;
-                        uid_doc.open_id = open_id;
-                        uid_doc.isLogin = false;
-                        return request_post.requestPost(postUrl, uid_doc);
+                    const json_result = JSON.parse(result),
+                          status = json_result.status;
+                    let   staff_data = json_result.data ? json_result.data:{};
+                    console.log('staff_data', staff_data);
+                    staff_data.scence = "register";
+                    if (status === 1) {
+                        staff_data.isRegister = 1;
+                    } else {
+                        staff_data.isRegister = 2;
                     }
-                })
-                .then(result => {
-                    resolve(JSON.parse(result));
+                    var connection = global.connection;
+                    connection.send(JSON.stringify(staff_data));
+                    resolve(staff_data);
                 })
                 .catch(err => {
                     console.error(err);
+                    var connection = global.connection;
+                    connection.send(JSON.stringify({isRegister: 0}));
+                })
+        })
+    },
+    loginCheck: (open_id, uid) => {
+        return new Promise((resolve, reject) => {
+            const openidUrl = config.pos.url + '/staff/login?open_id=' + open_id + '&uid='+uid;
+            request_get.requestGet(openidUrl)
+                .then(result => {
+                    const json_result = JSON.parse(result),
+                          status = json_result.status;
+                    let   staff_data = json_result.data ? json_result.data : {};
+                    console.log('staff_data', staff_data);
+                    staff_data.uid = uid;
+                    staff_data.scence = "login";
+                    if (status === 1) {
+                        staff_data.isLogin = 1;
+                        staff_data.isStaff = true;
+                    } else {
+                        staff_data.open_id = open_id;
+                        staff_data.isLogin = 2;
+                        staff_data.nickname = "不是员工";
+                        staff_data.isStaff = false;
+                    }
+                    var connection = global.connection;
+                    connection.send(JSON.stringify(staff_data));
+                    resolve(staff_data);
+                })
+                .catch(err => {
+                    console.error(err);
+                    var connection = global.connection;
+                    connection.send(JSON.stringify({isLogin:0}));
                 })
         })
     }
+
 }
 
 module.exports = exports = user;

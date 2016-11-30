@@ -25,10 +25,18 @@ AV.Cloud.useMasterKey();
 // LeanEngine 运行时会分配端口并赋值到该变量。
 var PORT = parseInt(process.env.LEANCLOUD_APP_PORT || 3000);
 app = express();
+var server = require('http').createServer(app);
 
-var server = require('http').createServer(app),
-    WebSocketServer = require('websocket').server;
+// global.ws = WebSocketServer;
+var history = []; // entire message history
+var clients = []; // list of currently connected clients (users)
+// Helper function for escaping input strings
+function htmlEntities(str) {
+    return String(str).replace(/&/g, '&').replace(/</g, '<')
+        .replace(/>/g, '>').replace(/"/g, '"');
+}
 
+var WebSocketServer = require('websocket').server;
 const wsServer = new WebSocketServer({
     httpServer: server,
     autoAcceptConnections: false,
@@ -36,76 +44,53 @@ const wsServer = new WebSocketServer({
     maxReceivedMessageSize: 64 * 1024 * 1024, // 64MiB
 });
 
-const sendLogin = function(url, connection) {
-    request_get.requestGet(url)
-        .then(result => {
-            const result1 = JSON.parse(result);
-            console.log(typeof result1);
-            console.log('result1', result1)
-            let data = result1.data ? result1.data : { isLogin: false };
-            console.log('data', data)
-            let isLogin = data.isLogin ? data.isLogin : false;
-            if (isLogin) {
-                // connection.send({islogin: islogin})
-                connection.send(JSON.stringify({ uid: data.uid, isLogin: isLogin }));
-            } else {
-                sendLogin(url, connection);
-            }
-        })
-}
+var connection;
 
 wsServer.on('request', function(request) {
-    var connection = request.accept('echo-protocol', request.origin);
-    let timeVal;
-    connection.send("connect success");
+    connection = request.accept('echo-protocol', request.origin);
+    global.connection = connection;
+    // accept connection - you should check 'request.origin'
+    console.log((new Date()) + ' Connection from origin: ' + request.origin + '.');
+    connection.send('success')
+    var index = clients.push(connection) - 1;
+    console.log('clients', clients);
+    var userName = "soon!";
+    if (history.length > 0) {
+        // send back chat history
+        connection.sendUTF(JSON.stringify({ type: 'history', data: history }));
+    }
+    // user sent some message
     connection.on('message', function(message) {
-        if (message.type === 'utf8') {
-            console.log('Received Message: ' + message.utf8Data);
-            // connection.sendUTF(message.utf8Data);
-            const uidUrl = config.pos.url + '/uid/' + Number(message.utf8Data);
-            timeVal = setInterval(function() {
-                request_get.requestGet(uidUrl)
-                    .then(result => {
-                        let result1 = {};
-                        if (typeof result !== undefined) {
-                            result1 = JSON.parse(result);
-                        } else {
-                            result1 = {};
-                        }
-                        console.log('result1', result1)
-                        console.log(result1);
-                        let data = result1.data ? result1.data : { isLogin: false };
-                        console.log('data', data)
-                        let isLogin = data.isLogin ? data.isLogin : false;
-                        if (isLogin === true) {
-                            connection.send(JSON.stringify({ uid: data.uid, isLogin: isLogin }));
-                            clearInterval(timeVal);
-                        } else {
-                            connection.send(JSON.stringify({ uid: data.uid, isLogin: isLogin }));
-
-                        }
-
-                    })
-                    // connection.send(JSON.stringify({uid:message.utf8Data, data:'111'}));
-            }, 2000)
-        } else if (message.type === 'binary') {
-            console.log('Received Binary Message of ' + message.binaryData.length + ' bytes');
-            connection.sendBytes(message.binaryData);
+        if (message.type === 'utf8') { // accept only text ------ htmlEntities(message.utf8Data);
+            console.log((new Date()) + ' Received Message from ' + userName + ': ' + message.utf8Data);
+            // we want to keep history of all sent messages
+            var obj = {
+                time: (new Date()).getTime(),
+                text: htmlEntities(message.utf8Data),
+                author: userName
+            };
+            history.push(obj);
+            // broadcast message to all connected clients
+            var json = JSON.stringify({ type: 'message', data: obj });
+            for (var i = 0; i < clients.length; i++) {
+                clients[i].sendUTF(json);
+            }
         }
     });
-    connection.on('close', function(reasonCode, description) {
-        clearInterval(timeVal);
-        console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
+
+    // user disconnected
+    connection.on('close', function(connection) {
+        console.log((new Date()) + " Peer " + connection.remoteAddress + " disconnected.");
+        clients.splice(index, 1); // remove user from the list of connected clients
     });
 });
 
 // 应用程序加载
 
-require('./config/express')(app, config);
+require('./config/express')(app, config, wsServer);
 
 server.listen(PORT, function() {
     console.log('Node app is running, port:', PORT);
-
     // 注册全局未捕获异常处理器
     process.on('uncaughtException', function(err) {
         console.error("Caught exception:", err.stack);

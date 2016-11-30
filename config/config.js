@@ -25,7 +25,7 @@ var config = {
     user_url: 'https://api.weixin.qq.com/cgi-bin/user/info?access_token='
   },
   pos:{
-    url: 'http://4s.dkys.org:15586'
+    url: 'http://3s.dkys.org:24719'
   }
 };
 
