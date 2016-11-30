@@ -86,7 +86,11 @@ const user = {
                         staff_data.isStaff = false;
                     }
                     var connection = global.connection;
-                    connection.send(JSON.stringify(staff_data));
+                    var clients = global.ws_client;
+                    for (var i = 0; i < clients.length; i++) {
+                        clients[i].send(JSON.stringify(staff_data));
+                    }
+                    // connection.send(JSON.stringify(staff_data));
                     resolve(staff_data);
                 })
                 .catch(err => {

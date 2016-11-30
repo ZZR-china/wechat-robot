@@ -27,10 +27,8 @@ var PORT = parseInt(process.env.LEANCLOUD_APP_PORT || 3000);
 app = express();
 var server = require('http').createServer(app);
 
-// global.ws = WebSocketServer;
-var history = []; // entire message history
+//WebSocket;
 var clients = []; // list of currently connected clients (users)
-// Helper function for escaping input strings
 function htmlEntities(str) {
     return String(str).replace(/&/g, '&').replace(/</g, '<')
         .replace(/>/g, '>').replace(/"/g, '"');
@@ -45,43 +43,33 @@ const wsServer = new WebSocketServer({
 });
 
 var connection;
+global.ws_client = clients;
 
 wsServer.on('request', function(request) {
     connection = request.accept('echo-protocol', request.origin);
     global.connection = connection;
     // accept connection - you should check 'request.origin'
     console.log((new Date()) + ' Connection from origin: ' + request.origin + '.');
-    connection.send('success')
     var index = clients.push(connection) - 1;
-    console.log('clients', clients);
-    var userName = "soon!";
-    if (history.length > 0) {
-        // send back chat history
-        connection.sendUTF(JSON.stringify({ type: 'history', data: history }));
-    }
+    var time=  (new Date()).getTime();
+    var userName = "foowalaclient" + time;
     // user sent some message
     connection.on('message', function(message) {
         if (message.type === 'utf8') { // accept only text ------ htmlEntities(message.utf8Data);
             console.log((new Date()) + ' Received Message from ' + userName + ': ' + message.utf8Data);
-            // we want to keep history of all sent messages
-            var obj = {
-                time: (new Date()).getTime(),
-                text: htmlEntities(message.utf8Data),
-                author: userName
-            };
-            history.push(obj);
             // broadcast message to all connected clients
-            var json = JSON.stringify({ type: 'message', data: obj });
+            var json = JSON.stringify({ type: 'message', data: userName });
+            console.log(clients.length);
             for (var i = 0; i < clients.length; i++) {
                 clients[i].sendUTF(json);
             }
         }
     });
-
     // user disconnected
     connection.on('close', function(connection) {
         console.log((new Date()) + " Peer " + connection.remoteAddress + " disconnected.");
-        clients.splice(index, 1); // remove user from the list of connected clients
+        // remove user from the list of connected clients
+        clients.splice(index, 1);
     });
 });
 
