@@ -4,6 +4,8 @@ const regqr = require('../helpers/regqr'),
     request_get = require('../helpers/request_get'),
     request_post = require('../helpers/request_post');
 
+var clients = global.ws_client;
+
 const user = {
     adminRgister: (open_id, store_id) => {
         return new Promise((resolve, reject) => {
@@ -25,12 +27,13 @@ const user = {
                     } else {
                         staff_data.isRegister = 2;
                     }
-                    var connection = global.connection;
-                    connection.send(JSON.stringify(staff_data));
+                    const message = JSON.stringify(staff_data);
+                    clients.broadcast(message);
                     resolve(staff_data);
                 })
                 .catch(err => {
                     console.error(err);
+                    clients.broadcast(JSON.stringify({store_id:store_id, isRegister: 0}));
                 })
         })
     },
@@ -54,14 +57,13 @@ const user = {
                     } else {
                         staff_data.isRegister = 2;
                     }
-                    var connection = global.connection;
-                    connection.send(JSON.stringify(staff_data));
+                    const message = JSON.stringify(staff_data);
+                    clients.broadcast(message);
                     resolve(staff_data);
                 })
                 .catch(err => {
                     console.error(err);
-                    var connection = global.connection;
-                    connection.send(JSON.stringify({isRegister: 0}));
+                    clients.broadcast(JSON.stringify({store_id:store_id, isRegister: 0}));
                 })
         })
     },
@@ -85,20 +87,12 @@ const user = {
                         staff_data.nickname = "不是员工";
                         staff_data.isStaff = false;
                     }
-                    var connection = global.connection;
-                    var clients = global.ws_client;
                     var message = JSON.stringify(staff_data);
                     clients.broadcast(message);
-                    // for (var i = 0; i < clients.length; i++) {
-                    //     clients[i].send(JSON.stringify(staff_data));
-                    // }
-                    // connection.send(JSON.stringify(staff_data));
                     resolve(staff_data);
                 })
                 .catch(err => {
-                    console.error(err);
-                    var connection = global.connection;
-                    connection.send(JSON.stringify({isLogin:0}));
+                    clients.broadcast(JSON.stringify({uid:uid, isLogin:0}));
                 })
         })
     }
