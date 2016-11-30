@@ -45,6 +45,12 @@ const wsServer = new WebSocketServer({
 var connection;
 global.ws_client = clients;
 
+clients.broadcast = function(message){
+    for (var i = 0; i < clients.length; i++) {
+        clients[i].send(message);
+    }
+}
+
 wsServer.on('request', function(request) {
     connection = request.accept('echo-protocol', request.origin);
     global.connection = connection;
@@ -57,17 +63,12 @@ wsServer.on('request', function(request) {
     connection.on('message', function(message) {
         if (message.type === 'utf8') { // accept only text ------ htmlEntities(message.utf8Data);
             console.log((new Date()) + ' Received Message from ' + userName + ': ' + message.utf8Data);
-            // broadcast message to all connected clients
-            var json = JSON.stringify({ type: 'message', data: userName });
-            console.log(clients.length);
-            for (var i = 0; i < clients.length; i++) {
-                clients[i].sendUTF(json);
-            }
         }
     });
     // user disconnected
     connection.on('close', function(connection) {
         console.log((new Date()) + " Peer " + connection.remoteAddress + " disconnected.");
+        console.log('index', index);
         // remove user from the list of connected clients
         clients.splice(index, 1);
     });

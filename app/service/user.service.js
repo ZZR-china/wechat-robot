@@ -87,9 +87,11 @@ const user = {
                     }
                     var connection = global.connection;
                     var clients = global.ws_client;
-                    for (var i = 0; i < clients.length; i++) {
-                        clients[i].send(JSON.stringify(staff_data));
-                    }
+                    var message = JSON.stringify(staff_data);
+                    clients.broadcast(message);
+                    // for (var i = 0; i < clients.length; i++) {
+                    //     clients[i].send(JSON.stringify(staff_data));
+                    // }
                     // connection.send(JSON.stringify(staff_data));
                     resolve(staff_data);
                 })
