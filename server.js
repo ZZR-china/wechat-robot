@@ -28,12 +28,6 @@ app = express();
 var server = require('http').createServer(app);
 
 //WebSocket;
-var clients = []; // list of currently connected clients (users)
-function htmlEntities(str) {
-    return String(str).replace(/&/g, '&').replace(/</g, '<')
-        .replace(/>/g, '>').replace(/"/g, '"');
-}
-
 var WebSocketServer = require('websocket').server;
 const wsServer = new WebSocketServer({
     httpServer: server,
@@ -42,7 +36,7 @@ const wsServer = new WebSocketServer({
     maxReceivedMessageSize: 64 * 1024 * 1024, // 64MiB
 });
 
-var connection;
+var clients = []; // list of currently connected clients (users)
 global.ws_client = clients;
 
 clients.broadcast = function(message){
@@ -52,24 +46,19 @@ clients.broadcast = function(message){
 }
 
 wsServer.on('request', function(request) {
-    connection = request.accept('echo-protocol', request.origin);
-    global.connection = connection;
+    var connection = request.accept('echo-protocol', request.origin);
     // accept connection - you should check 'request.origin'
     console.log((new Date()) + ' Connection from origin: ' + request.origin + '.');
+    var ws_time =  (new Date()).getTime();
     var index = clients.push(connection) - 1;
-    var time=  (new Date()).getTime();
-    var userName = "foowalaclient" + time;
-    // user sent some message
+    var userName = "foowalaclient" + ws_time;
     connection.on('message', function(message) {
-        if (message.type === 'utf8') { // accept only text ------ htmlEntities(message.utf8Data);
+        if (message.type === 'utf8') {
             console.log((new Date()) + ' Received Message from ' + userName + ': ' + message.utf8Data);
         }
     });
-    // user disconnected
     connection.on('close', function(connection) {
         console.log((new Date()) + " Peer " + connection.remoteAddress + " disconnected.");
-        console.log('index', index);
-        // remove user from the list of connected clients
         clients.splice(index, 1);
     });
 });
@@ -90,4 +79,4 @@ server.listen(PORT, function() {
 });
 
 // 应用程序启动 mongoose
-require('./app/helpers/mongoconn');
+// require('./app/helpers/mongoconn');

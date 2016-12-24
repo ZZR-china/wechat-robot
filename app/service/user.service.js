@@ -20,7 +20,6 @@ const user = {
                     const json_result = JSON.parse(result),
                           status = json_result.status;
                     let   staff_data = json_result.data ? json_result.data:{};
-                    console.log('staff_data', staff_data);
                     staff_data.scence = "register";
                     if (status === 1) {
                         staff_data.isRegister = 1;
@@ -75,7 +74,6 @@ const user = {
                     const json_result = JSON.parse(result),
                           status = json_result.status;
                     let   staff_data = json_result.data ? json_result.data : {};
-                    console.log('staff_data', staff_data);
                     staff_data.uid = uid;
                     staff_data.scence = "login";
                     if (status === 1) {
@@ -96,7 +94,6 @@ const user = {
                 })
         })
     }
-
 }
 
 module.exports = exports = user;

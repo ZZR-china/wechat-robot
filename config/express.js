@@ -28,6 +28,23 @@ module.exports = function(app, config) {
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(cookieParser());
 
+    //define res success
+    app.use(function(req, res, next){
+        let result = {};
+        res.success = function(data, code) {
+            result.status = 1;
+            result.code = code ? code : 200;
+            result.data = data ? data : null;
+            res.send(result);
+        };
+        res.fail = function(code, data){
+            result.status = 0;
+            result.code = code ? code : 500;
+            result.data = data ? data : null;
+            res.send(result);
+        }
+        next();
+    })
     // Mongodb 预加载
     models = glob.sync(config.root + './app/models/*.js');
     async.each(models, function(model, callback) {
@@ -40,14 +57,13 @@ module.exports = function(app, config) {
             }
         })
     //mongo connect
-    var db = require('../app/helpers/mongoconn')
+    // var db = require('../app/helpers/mongoconn')
     app.use(function(req, res, next) {
         res.set({
             'Access-Control-Allow-Origin': '*',
         });
         next();
     });
-
     // load controller
     controllers = glob.sync(config.root + '/app/controller/*.js');
     async.each(controllers, function(controller, callback) {
@@ -60,10 +76,9 @@ module.exports = function(app, config) {
         }
     })
 
-    //获取token并存入数据库
     var appId,
         appSecret;
-    if (process.env.online) {
+    if (process.env.online === 1) {
         appId = process.env.testwechat_appId;
         appSecret = process.env.testwechat_appSecret;
     } else {
@@ -72,7 +87,7 @@ module.exports = function(app, config) {
         appSecret = secret.testwechat.appSecret;
     }
     var token_url = config.wechat_api.token_url + '&appId=' + appId + '&secret=' + appSecret;
-    wechat_token.saveToken(token_url);
+    global.token_url = token_url;
 
     app.use(function(req, res, next) {
         // 如果任何一个路由都没有返回响应，则抛出一个 404 异常给后续的异常处理器
